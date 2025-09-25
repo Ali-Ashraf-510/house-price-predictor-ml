@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Price Predictor - AI Powered</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .form-group .icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.1rem;
+            z-index: 1;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .predict-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+        }
+
+        .predict-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .predict-btn.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .predict-btn .spinner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .predict-btn.loading .spinner {
+            display: block;
+        }
+
+        .predict-btn.loading .btn-text {
+            opacity: 0;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result.success {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+        }
+
+        .result.error {
+            background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
+            color: white;
+        }
+
+        .result::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .features-info {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .features-info h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .features-info h3 i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-item strong {
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header .subtitle {
+                font-size: 1rem;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #2c3e50;
+            color: white;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-home"></i> House Price Predictor</h1>
+            <p class="subtitle">AI-Powered Real Estate Valuation Tool</p>
+        </div>
+        
+        <div class="form-container">
+            <div class="features-info">
+                <h3><i class="fas fa-info-circle"></i> How it works</h3>
+                <p>Our machine learning model analyzes key property features to predict house prices with high accuracy. Simply fill in the details below to get an instant estimate.</p>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Income Level:</strong> Average area household income
+                    </div>
+                    <div class="info-item">
+                        <strong>House Age:</strong> Average age of houses in the area
+                    </div>
+                    <div class="info-item">
+                        <strong>Rooms:</strong> Average number of rooms per house
+                    </div>
+                    <div class="info-item">
+                        <strong>Bedrooms:</strong> Average number of bedrooms
+                    </div>
+                    <div class="info-item">
+                        <strong>Population:</strong> Total area population
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="/predict" id="predictionForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="avg_income"><i class="fas fa-dollar-sign"></i> Average Area Income ($)</label>
+                        <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                        <input type="number" step="0.01" name="Avg. Area Income" id="avg_income" 
+                               value="{{ input_values['Avg. Area Income'] if input_values else '' }}" 
+                               placeholder="e.g., 68000.00" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="avg_age"><i class="fas fa-calendar-alt"></i> Average House Age (years)</label>
+                        <div class="icon"><i class="fas fa-calendar-alt"></i></div>
+                        <input type="number" step="0.01" name="Avg. Area House Age" id="avg_age"
+                               value="{{ input_values['Avg. Area House Age'] if input_values else '' }}" 
+                               placeholder="e.g., 6.5" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="avg_rooms"><i class="fas fa-door-open"></i> Average Number of Rooms</label>
+                        <div class="icon"><i class="fas fa-door-open"></i></div>
+                        <input type="number" step="0.01" name="Avg. Area Number of Rooms" id="avg_rooms"
+                               value="{{ input_values['Avg. Area Number of Rooms'] if input_values else '' }}" 
+                               placeholder="e.g., 7.2" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="avg_bedrooms"><i class="fas fa-bed"></i> Average Number of Bedrooms</label>
+                        <div class="icon"><i class="fas fa-bed"></i></div>
+                        <input type="number" step="0.01" name="Avg. Area Number of Bedrooms" id="avg_bedrooms"
+                               value="{{ input_values['Avg. Area Number of Bedrooms'] if input_values else '' }}" 
+                               placeholder="e.g., 4.1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="area_population"><i class="fas fa-users"></i> Area Population</label>
+                        <div class="icon"><i class="fas fa-users"></i></div>
+                        <input type="number" step="0.01" name="Area Population" id="area_population"
+                               value="{{ input_values['Area Population'] if input_values else '' }}" 
+                               placeholder="e.g., 35000" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="predict-btn" id="predictBtn">
+                    <span class="btn-text"><i class="fas fa-calculator"></i> Predict House Price</span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
+            
+            {% if prediction_text %}
+            <div class="result {{ 'error' if 'Error' in prediction_text else 'success' }}">
+                {% if 'Error' not in prediction_text %}
+                    <i class="fas fa-home"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-triangle"></i>
+                {% endif %}
+                {{ prediction_text }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            <p><i class="fas fa-robot"></i> Powered by Machine Learning | Built with Flask & Scikit-learn</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', function() {
+            const btn = document.getElementById('predictBtn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+        });
+
+        // Add input validation and formatting
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value < 0) {
+                    this.value = 0;
+                }
+            });
+        });
+
+        // Add smooth scrolling to result
+        window.addEventListener('load', function() {
+            const result = document.querySelector('.result');
+            if (result) {
+                result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    </script>
+</body>
+</html>
