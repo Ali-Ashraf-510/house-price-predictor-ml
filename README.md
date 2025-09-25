@@ -266,13 +266,7 @@ python app.py
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📞 Support
 
-If you encounter any issues or have questions:
-
-1. Check the [Issues](../../issues) page
-2. Create a new issue with detailed description
-3. Include error messages and system information
 
 ## 🚀 Future Enhancements
 
@@ -304,4 +298,4 @@ The application features a modern, responsive design with:
 
 **Made with ❤️ and Python**
 
-*Last updated: January 2024*
+*Last updated: January 2025*
